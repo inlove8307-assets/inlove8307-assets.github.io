@@ -18,8 +18,8 @@
       var style = document.createElement('style');
 
       style.textContent = '\
-      .anchors {position:absolute;top:50%;left:50%;z-index:10;transform:translate(-50%, -50%);}\
-      .anchor {display:inline-flex;justify-content:center;align-items:center;margin-bottom:4px;margin-right:4px;padding:0 4px;height:20px;border-radius:5px;background-color:rgba(255, 255, 255, 0.5);font-size:14px;line-height:1;color:rgb(0, 0, 0)!important;}\
+      .anchors {position:absolute;top:0;left:0;z-index:10;}\
+      .anchor {display:inline-flex;justify-content:center;align-items:center;margin-top:4px;margin-left:4px;padding:0 4px;height:20px;border:1px solid rgba(0, 0, 0, 0.5);border-radius:5px;background-color:rgba(255, 255, 255, 0.5);font-size:13px;line-height:1;color:rgb(0, 0, 0)!important;text-decoration:none;}\
       .anchor:hover {background-color:rgb(255, 255, 255, 1);}';
 
       document.querySelector('body').appendChild(style);
@@ -50,6 +50,7 @@
                 anchor.setAttribute('target', '_blank');
                 anchor.innerHTML = sizes[0];
                 anchors.appendChild(anchor);
+                break;
               }
 
               array.shift();
