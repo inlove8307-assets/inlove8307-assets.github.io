@@ -1,122 +1,113 @@
-  javascript: window.load = function(){
-    function requestData(url, type, callback){
-      return fetch(url)
-      .then(function(response){
-        if (response.ok) {
-          switch(type){
-            case 'text': return response.text();
-            case 'blob': return response.blob();
-          }
+javascript: window.load = function(){
+  function requestData(url, type, callback){
+    return fetch(url)
+    .then(function(response){
+      if (response.ok) {
+        switch(type){
+          case 'text': return response.text();
+          case 'blob': return response.blob();
         }
-      })
-      .then(function(response){
-        callback(response);
-      });
-    }
+      }
+    })
+    .then(function(response){
+      callback(response);
+    });
+  }
 
-    function flickr(){
-      var style = document.createElement('style');
+  function flickr(){
+    var regexp = [/\/photos\/[\w-_@]+\/[\d]+\//g, /\/photos\/[\w-_@]+\/[\d]+\/sizes\/[\w]+\//g, /\([\d]+ &times; [\d]+\)/g]
+      , style = document.createElement('style');
 
-      style.textContent = '\
-      .anchors {position:absolute;top:0;left:0;z-index:10;}\
-      .anchor {display:inline-flex;justify-content:center;align-items:center;margin-top:4px;margin-left:4px;padding:0 4px;height:20px;border:1px solid rgba(0, 0, 0, 0.5);border-radius:5px;background-color:rgba(255, 255, 255, 0.5);font-size:13px;line-height:1;color:rgb(0, 0, 0)!important;text-decoration:none;}\
-      .anchor:hover {background-color:rgb(255, 255, 255, 1);}';
+    style.textContent = '\
+    .anchor {display:inline-flex;justify-content:center;align-items:center;position:absolute;top:4px;left:4px;z-index:10;padding:0 4px;height:20px;border:1px solid rgba(0, 0, 0, 0.5);border-radius:5px;background-color:rgba(255, 255, 255, 0.5);font-size:13px;line-height:1;color:rgb(0, 0, 0)!important;text-decoration:none;}\
+    .anchor:hover {background-color:rgb(255, 255, 255, 1);}';
 
-      document.querySelector('body').appendChild(style);
+    document.querySelector('body').appendChild(style);
+    document.addEventListener('mouseover', function(event){
+      var target = event.target
+        , parent = target.parentNode;
 
-      document.addEventListener('mouseover', function(event){
-        var parent, anchors, url;
+      if (target.tagName == 'A' && target.classList.contains('overlay') && !parent.dataset.fetch) {
+        requestData([location.origin, target.href.match(regexp[0])[0], 'sizes/'].join(''), 'text', function(text){
+          var array = text.match(regexp[1])
+            , sizes = text.match(regexp[2])
+            , anchor;
 
-        if (event.target.tagName == 'A' && event.target.classList.contains('overlay')) {
-          parent = event.target.parentNode;
+          while(array.length){
+            if (array[0].match(/\/o\//g) || !array[1]) {
+              anchor = document.createElement('a');
+              anchor.setAttribute('class', 'anchor');
+              anchor.setAttribute('href', array[0]);
+              anchor.setAttribute('target', '_blank');
+              anchor.innerHTML = sizes[0];
+              parent.appendChild(anchor);
+              break;
+            }
 
-          if (parent.dataset.fetch) return;
+            array.shift();
+            sizes.shift();
+          }
+        });
 
-          anchors = document.createElement('span');
-          anchors.setAttribute('class', 'anchors');
-          parent.appendChild(anchors);
-          url = [location.origin, event.target.href.match(/\/photos\/[\w-_@]+\/[\d]+\//g)[0], 'sizes/'].join('');
+        parent.dataset.fetch = true;
+      }
+    });
 
-          requestData([url].join(''), 'text', function(text){
-            var array = text.match(/\/photos\/[\w-_@]+\/[\d]+\/sizes\/[\w]+\//g)
-              , sizes = text.match(/\([\d]+ &times; [\d]+\)/g)
-              , anchor;
+    document.addEventListener('click', function(event){
+      if (event.target.classList.contains('anchor')) {
+        requestData(event.target.getAttribute('href'), 'text', function(text){
+          var array = text.match(/live.staticflickr.com\/[\d]+\/[\w-_@]+\.[\D]{3}/g)
+            , url = ['https://', array[array.length-1]].join('');
 
-            while(array.length){
-              if (array[0].match(/\/o\//g) || !array[1]) {
-                anchor = document.createElement('a');
-                anchor.setAttribute('class', 'anchor');
-                anchor.setAttribute('href', array[0]);
-                anchor.setAttribute('target', '_blank');
-                anchor.innerHTML = sizes[0];
-                anchors.appendChild(anchor);
-                break;
-              }
+          requestData(url, 'blob', function(blob){
+            var reader = new FileReader();
 
-              array.shift();
-              sizes.shift();
+            reader.readAsDataURL(blob);
+            reader.onloadend = function(){
+              var anchor = document.createElement('a');
+
+              url = url.split('/');
+              anchor.setAttribute('href', reader.result);
+              anchor.setAttribute('download', url[url.length-1]);
+              anchor.click();
             }
           });
+        });
 
-          parent.dataset.fetch = true;
-        }
-      });
+        event.preventDefault();
+      }
+    });
+  }
 
-      document.addEventListener('click', function(event){
-        if (event.target.classList.contains('anchor')) {
-          requestData(event.target.getAttribute('href'), 'text', function(text){
-            var array = text.match(/live.staticflickr.com\/[\d]+\/[\w-_@]+\.[\D]{3}/g)
-              , url = ['https://', array[array.length-1]].join('');
+  function wallhaven(){
+    document.addEventListener('click', function(event){
+      if (event.target.classList.contains('preview')) {
+        requestData(event.target.href, 'text', function(text){
+          var array = text.match(/https:\/\/w.wallhaven.cc\/full\/[\w]+\/wallhaven-[\w]+\.[\D]{3}/g);
+          var url = array[0];
 
-            requestData(url, 'blob', function(blob){
-              var reader = new FileReader();
+          requestData(url, 'blob', function(blob){
+            var reader = new FileReader();
 
-              reader.readAsDataURL(blob);
-              reader.onloadend = function(){
-                var anchor = document.createElement('a');
+            reader.readAsDataURL(blob);
+            reader.onloadend = function(){
+              var anchor = document.createElement('a');
 
-                url = url.split('/');
-                anchor.setAttribute('href', reader.result);
-                anchor.setAttribute('download', url[url.length-1]);
-                anchor.click();
-              }
-            });
+              url = url.split('/');
+              anchor.setAttribute('href', reader.result);
+              anchor.setAttribute('download', url[url.length-1]);
+              anchor.click();
+            }
           });
+        });
 
-          event.preventDefault();
-        }
-      });
-    }
+        event.preventDefault();
+      }
+    });
+  }
 
-    function wallhaven(){
-      document.addEventListener('click', function(event){
-        if (event.target.classList.contains('preview')) {
-          requestData(event.target.href, 'text', function(text){
-            var array = text.match(/https:\/\/w.wallhaven.cc\/full\/[\w]+\/wallhaven-[\w]+\.[\D]{3}/g);
-            var url = array[0];
-
-            requestData(url, 'blob', function(blob){
-              var reader = new FileReader();
-
-              reader.readAsDataURL(blob);
-              reader.onloadend = function(){
-                var anchor = document.createElement('a');
-
-                url = url.split('/');
-                anchor.setAttribute('href', reader.result);
-                anchor.setAttribute('download', url[url.length-1]);
-                anchor.click();
-              }
-            });
-          });
-
-          event.preventDefault();
-        }
-      });
-    }
-
-    switch(location.host){
-      case 'www.flickr.com': flickr(); break;
-      case 'wallhaven.cc': wallhaven(); break;
-    }
-  }();
+  switch(location.host){
+    case 'www.flickr.com': flickr(); break;
+    case 'wallhaven.cc': wallhaven(); break;
+  }
+}();
