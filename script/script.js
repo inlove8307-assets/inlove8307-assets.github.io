@@ -15,7 +15,7 @@ javascript: window.load = function(){
   }
 
   function flickr(){
-    var regexp = [/\/photos\/[\w-_@]+\/[\d]+\//g, /\/photos\/[\w-_@]+\/[\d]+\/sizes\/[\w]+\//g, /\([\d]+ &times; [\d]+\)/g]
+    var regexp = [/\/photos\/[\w-_@]+\/[\d]+\//g, /\/photos\/[\w-_@]+\/[\d]+\/sizes\/[\w]+\//g, /\([\d]+ &times; [\d]+\)/g, /live.staticflickr.com\/[\d]+\/[\w-_@]+\.[\D]{3}/g]
       , style = document.createElement('style');
 
     style.textContent = '\
@@ -29,24 +29,17 @@ javascript: window.load = function(){
 
       if (target.tagName == 'A' && target.classList.contains('overlay') && !parent.dataset.fetch) {
         requestData([location.origin, target.href.match(regexp[0])[0], 'sizes/'].join(''), 'text', function(text){
-          var array = text.match(regexp[1])
-            , sizes = text.match(regexp[2])
+          var array = [text.match(regexp[1]), text.match(regexp[2])]
+            , link = array[0][0].match(/\/o\//g) || array[0][array[0].length-1]
+            , size = array[0][0].match(/\/o\//g) ? array[1][0] : array[1][array[1].length-1]
             , anchor;
 
-          while(array.length){
-            if (array[0].match(/\/o\//g) || !array[1]) {
-              anchor = document.createElement('a');
-              anchor.setAttribute('class', 'anchor');
-              anchor.setAttribute('href', array[0]);
-              anchor.setAttribute('target', '_blank');
-              anchor.innerHTML = sizes[0];
-              parent.appendChild(anchor);
-              break;
-            }
-
-            array.shift();
-            sizes.shift();
-          }
+          anchor = document.createElement('a');
+          anchor.setAttribute('class', 'anchor');
+          anchor.setAttribute('href', link);
+          anchor.setAttribute('target', '_blank');
+          anchor.innerHTML = size;
+          parent.appendChild(anchor);
         });
 
         parent.dataset.fetch = true;
@@ -56,7 +49,7 @@ javascript: window.load = function(){
     document.addEventListener('click', function(event){
       if (event.target.classList.contains('anchor')) {
         requestData(event.target.getAttribute('href'), 'text', function(text){
-          var array = text.match(/live.staticflickr.com\/[\d]+\/[\w-_@]+\.[\D]{3}/g)
+          var array = text.match(regexp[3])
             , url = ['https://', array[array.length-1]].join('');
 
           requestData(url, 'blob', function(blob){
@@ -111,3 +104,26 @@ javascript: window.load = function(){
     case 'wallhaven.cc': wallhaven(); break;
   }
 }();
+
+
+/*
+/photos/134104188@N07/50212337213/sizes/sq/(75 × 75)
+/photos/134104188@N07/50212337213/sizes/q/(150 × 150)
+/photos/134104188@N07/50212337213/sizes/t/(100 × 67)
+/photos/134104188@N07/50212337213/sizes/s/(240 × 160)
+/photos/134104188@N07/50212337213/sizes/n/(320 × 213)
+/photos/134104188@N07/50212337213/sizes/w/(400 × 267)
+/photos/134104188@N07/50212337213/sizes/m/(500 × 334)
+/photos/134104188@N07/50212337213/sizes/z/(640 × 427)
+/photos/134104188@N07/50212337213/sizes/c/(800 × 534)
+/photos/134104188@N07/50212337213/sizes/h/(1024 × 683)
+/photos/134104188@N07/50212337213/sizes/k/(1600 × 1067)
+/photos/134104188@N07/50212337213/sizes/3k/(2048 × 1366)
+/photos/134104188@N07/50212337213/sizes/4k/(3072 × 2049)
+/photos/134104188@N07/50212337213/sizes/5k/(4096 × 2732)
+/photos/134104188@N07/50212337213/sizes/6k/(5120 × 3415)
+(6144 × 4098)
+
+
+
+*/
