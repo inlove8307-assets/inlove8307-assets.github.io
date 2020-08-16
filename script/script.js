@@ -30,7 +30,7 @@ javascript: window.load = function(){
       if (target.tagName == 'A' && target.classList.contains('overlay') && !parent.dataset.fetch) {
         requestData([location.origin, target.href.match(regexp[0])[0], 'sizes/'].join(''), 'text', function(text){
           var array = [text.match(regexp[1]), text.match(regexp[2])]
-            , link = array[0][0].match(/\/o\//g) || array[0][array[0].length-1]
+            , link = array[0][0].match(/\/o\//g) ? array[0][0] : array[0][array[0].length-1]
             , size = array[0][0].match(/\/o\//g) ? array[1][0] : array[1][array[1].length-1]
             , anchor;
 
@@ -104,26 +104,3 @@ javascript: window.load = function(){
     case 'wallhaven.cc': wallhaven(); break;
   }
 }();
-
-
-/*
-/photos/134104188@N07/50212337213/sizes/sq/(75 × 75)
-/photos/134104188@N07/50212337213/sizes/q/(150 × 150)
-/photos/134104188@N07/50212337213/sizes/t/(100 × 67)
-/photos/134104188@N07/50212337213/sizes/s/(240 × 160)
-/photos/134104188@N07/50212337213/sizes/n/(320 × 213)
-/photos/134104188@N07/50212337213/sizes/w/(400 × 267)
-/photos/134104188@N07/50212337213/sizes/m/(500 × 334)
-/photos/134104188@N07/50212337213/sizes/z/(640 × 427)
-/photos/134104188@N07/50212337213/sizes/c/(800 × 534)
-/photos/134104188@N07/50212337213/sizes/h/(1024 × 683)
-/photos/134104188@N07/50212337213/sizes/k/(1600 × 1067)
-/photos/134104188@N07/50212337213/sizes/3k/(2048 × 1366)
-/photos/134104188@N07/50212337213/sizes/4k/(3072 × 2049)
-/photos/134104188@N07/50212337213/sizes/5k/(4096 × 2732)
-/photos/134104188@N07/50212337213/sizes/6k/(5120 × 3415)
-(6144 × 4098)
-
-
-
-*/
