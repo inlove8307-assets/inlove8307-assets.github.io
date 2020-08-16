@@ -14,12 +14,26 @@ javascript: window.load = function(){
     });
   }
 
+  function downloadImage(blob, url){
+    var reader = new FileReader();
+
+    reader.readAsDataURL(blob);
+    reader.onloadend = function(){
+      var anchor = document.createElement('a');
+
+      url = url.split('/');
+      anchor.setAttribute('href', reader.result);
+      anchor.setAttribute('download', url[url.length-1]);
+      anchor.click();
+    }
+  }
+
   function flickr(){
     var regexp = [/\/photos\/[\w-_@]+\/[\d]+\//g, /\/photos\/[\w-_@]+\/[\d]+\/sizes\/[\w]+\//g, /\([\d]+ &times; [\d]+\)/g, /live.staticflickr.com\/[\d]+\/[\w-_@]+\.[\D]{3}/g]
       , style = document.createElement('style');
 
     style.textContent = '\
-    .anchor {display:inline-flex;justify-content:center;align-items:center;position:absolute;top:4px;left:4px;z-index:10;padding:0 4px;height:20px;border:1px solid rgba(0, 0, 0, 0.5);border-radius:5px;background-color:rgba(255, 255, 255, 0.5);font-size:13px;line-height:1;color:rgb(0, 0, 0)!important;text-decoration:none;}\
+    .anchor {position:absolute;top:4px;left:4px;z-index:10;padding:2px 4px;border:1px solid rgba(0, 0, 0, 0.5);border-radius:5px;background-color:rgba(255, 255, 255, 0.5);font-size:13px;line-height:1;color:rgb(0, 0, 0)!important;}\
     .anchor:hover {background-color:rgb(255, 255, 255, 1);}';
 
     document.querySelector('body').appendChild(style);
@@ -53,17 +67,7 @@ javascript: window.load = function(){
             , url = ['https://', array[array.length-1]].join('');
 
           requestData(url, 'blob', function(blob){
-            var reader = new FileReader();
-
-            reader.readAsDataURL(blob);
-            reader.onloadend = function(){
-              var anchor = document.createElement('a');
-
-              url = url.split('/');
-              anchor.setAttribute('href', reader.result);
-              anchor.setAttribute('download', url[url.length-1]);
-              anchor.click();
-            }
+            downloadImage(blob, url);
           });
         });
 
@@ -80,17 +84,7 @@ javascript: window.load = function(){
           var url = array[0];
 
           requestData(url, 'blob', function(blob){
-            var reader = new FileReader();
-
-            reader.readAsDataURL(blob);
-            reader.onloadend = function(){
-              var anchor = document.createElement('a');
-
-              url = url.split('/');
-              anchor.setAttribute('href', reader.result);
-              anchor.setAttribute('download', url[url.length-1]);
-              anchor.click();
-            }
+            downloadImage(blob, url);
           });
         });
 
