@@ -1,4 +1,4 @@
-javascript: window.load = function(){
+javascript: (function(){
   function requestData(url, type, callback){
     return fetch(url)
     .then(function(response){
@@ -62,8 +62,7 @@ javascript: window.load = function(){
     document.addEventListener('click', function(event){
       if (event.target.classList.contains('anchor')) {
         requestData(event.target.getAttribute('href'), 'text', function(text){
-          var array = text.match(/live.staticflickr.com\/[\d]+\/[\w-_@]+\.[\D]{3}/g)
-            , url = ['https://', array[array.length-1]].join('');
+          var url = text.match(/src="https:\/\/live.staticflickr.com\/[\d]+\/[\w]+\.[\D]{3}/g)[0].split('"')[1];
 
           requestData(url, 'blob', function(blob){
             downloadImage(blob, url);
@@ -79,8 +78,7 @@ javascript: window.load = function(){
     document.addEventListener('click', function(event){
       if (event.target.classList.contains('preview')) {
         requestData(event.target.href, 'text', function(text){
-          var array = text.match(/https:\/\/w.wallhaven.cc\/full\/[\w]+\/wallhaven-[\w]+\.[\D]{3}/g);
-          var url = array[0];
+          var url = text.match(/https:\/\/w.wallhaven.cc\/full\/[\w]+\/wallhaven-[\w]+\.[\D]{3}/g)[0];
 
           requestData(url, 'blob', function(blob){
             downloadImage(blob, url);
@@ -96,4 +94,4 @@ javascript: window.load = function(){
     case 'www.flickr.com': flickr(); break;
     case 'wallhaven.cc': wallhaven(); break;
   }
-}();
+}());
