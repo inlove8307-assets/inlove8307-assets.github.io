@@ -2,7 +2,7 @@ javascript: (function(){
   function requestData(url, type, callback){
     return fetch(url)
     .then(function(response){
-      if (response.ok) {
+      if(response.ok){
         switch(type){
           case 'text': return response.text();
           case 'blob': return response.blob();
@@ -39,7 +39,7 @@ javascript: (function(){
       var target = event.target
         , parent = target.parentNode;
 
-      if (target.tagName == 'A' && target.classList.contains('overlay') && !parent.dataset.fetch) {
+      if(target.tagName == 'A' && target.classList.contains('overlay') && !parent.dataset.fetch){
         requestData([location.origin, target.href.match(/\/photos\/[\w-_@]+\/[\d]+\//g)[0], 'sizes/'].join(''), 'text', function(text){
           var array = [text.match(/\/photos\/[\w-_@]+\/[\d]+\/sizes\/[\w]+\//g), text.match(/\([\d]+ &times; [\d]+\)/g)]
             , link = array[0][0].match(/\/o\//g) ? array[0][0] : array[0][array[0].length-1]
@@ -59,9 +59,9 @@ javascript: (function(){
     });
 
     document.addEventListener('click', function(event){
-      if (event.target.classList.contains('anchor')) {
+      if(event.target.classList.contains('anchor')){
         requestData(event.target.getAttribute('href'), 'text', function(text){
-          var url = text.match(/src="https:\/\/live.staticflickr.com\/[\d]+\/[\w]+\.[\D]{3}/g)[0].split('"')[1];
+          var url = text.match(/src="https:\/\/live.staticflickr.com\/[\d]+\/[\w]+\.[\D]{3}"/g)[0].split(/"/)[1];
 
           requestData(url, 'blob', function(blob){
             downloadImage(blob, url);
@@ -75,7 +75,7 @@ javascript: (function(){
 
   function wallhaven(){
     document.addEventListener('click', function(event){
-      if (event.target.classList.contains('preview')) {
+      if(event.target.classList.contains('preview')){
         requestData(event.target.href, 'text', function(text){
           var url = text.match(/https:\/\/w.wallhaven.cc\/full\/[\w]+\/wallhaven-[\w]+\.[\D]{3}/g)[0];
 
