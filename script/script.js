@@ -31,11 +31,10 @@ javascript: (function(){
   function flickr(){
     var style = document.createElement('style');
 
-    style.textContent = '\
-    .anchor {position:absolute;top:4px;left:4px;z-index:10;padding:2px 4px;border:1px solid rgba(0, 0, 0, 0.5);border-radius:5px;background-color:rgba(255, 255, 255, 0.5);font-size:13px;line-height:1;color:rgb(0, 0, 0)!important;}\
-    .anchor:hover {background-color:rgb(255, 255, 255, 1);}';
-
+    style.textContent += '.anchor {position:absolute;top:4px;left:4px;z-index:10;padding:2px 4px;border:1px solid rgba(0, 0, 0, 0.5);border-radius:5px;background-color:rgba(255, 255, 255, 0.5);font-size:13px;line-height:1;color:rgb(0, 0, 0)!important;}';
+    style.textContent += '.anchor:hover {background-color:rgb(255, 255, 255, 1);}';
     document.querySelector('body').appendChild(style);
+
     document.addEventListener('mouseover', function(event){
       var target = event.target
         , parent = target.parentNode;
