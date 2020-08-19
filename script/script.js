@@ -6,12 +6,20 @@ javascript: (function(){
         switch(type){
           case 'text': return response.text();
           case 'blob': return response.blob();
+          default: return response;
         }
       }
     })
     .then(function(response){
       callback(response);
     });
+  }
+
+  function parseHtml(string, callback){
+    var parser = new DOMParser()
+      , html = parser.parseFromString(string, 'text/html');
+
+    callback(html);
   }
 
   function downloadImage(blob, url){
@@ -37,20 +45,21 @@ javascript: (function(){
 
     document.addEventListener('mouseover', function(event){
       var target = event.target
-        , parent = target.parentNode;
+        , parent = target.parentNode
+        , url;
 
       if(target.tagName == 'A' && target.classList.contains('overlay') && !parent.dataset.fetch){
-        requestData([location.origin, target.href.match(/\/photos\/[\w-_@]+\/[\d]+\//g)[0], 'sizes/'].join(''), 'text', function(text){
-          var array = [text.match(/\/photos\/[\w-_@]+\/[\d]+\/sizes\/[\w]+\//g), text.match(/\([\d]+ &times; [\d]+\)/g)]
-            , link = array[0][0].match(/\/o\//g) ? array[0][0] : array[0][array[0].length-1]
-            , size = array[0][0].match(/\/o\//g) ? array[1][0] : array[1][array[1].length-1]
-            , anchor;
+        url = [location.origin, target.href.match(/\/photos\/[\w-_@]+\/[\d]+\//g)[0], 'sizes/sq/'].join('');
 
-          anchor = document.createElement('a');
+        requestData(url, 'text', function(text){
+          var links = text.match(/\/photos\/[\w-_@]+\/[\d]+\/sizes\/[\w]+\//g)
+            , sizes = text.match(/\([\d]+ &times; [\d]+\)/g)
+            , hasOrigin = links[0].match(/\/o\//g)
+            , anchor = document.createElement('a');
+
           anchor.setAttribute('class', 'anchor');
-          anchor.setAttribute('href', link);
-          anchor.setAttribute('target', '_blank');
-          anchor.innerHTML = size;
+          anchor.setAttribute('href', hasOrigin ? links[0] : links[links.length-1]);
+          anchor.innerHTML = hasOrigin ? sizes[0] : sizes[sizes.length-1];
           parent.appendChild(anchor);
         });
 
