@@ -110,7 +110,7 @@ js =
 }());
 )
 
-^+s:: RunJsFromChromeAddressBar(js)
++s:: RunJsFromChromeAddressBar(js)
 
 RunJsFromChromeAddressBar(js, exe := "chrome.exe") {
   static WM_GETOBJECT := 0x3D
@@ -152,9 +152,9 @@ SearchElement(parentElement, params)
 }
 
 AccObjectFromWindow(hWnd, idObject = 0) {
-  static IID_IDispatch   := "{00020400-0000-0000-C000-000000000046}"
+  static IID_IDispatch := "{00020400-0000-0000-C000-000000000046}"
     , IID_IAccessible := "{618736E0-3C3D-11CF-810C-00AA00389B71}"
-    , OBJID_NATIVEOM  := 0xFFFFFFF0, VT_DISPATCH := 9, F_OWNVALUE := 1
+    , OBJID_NATIVEOM := 0xFFFFFFF0, VT_DISPATCH := 9, F_OWNVALUE := 1
     , h := DllCall("LoadLibrary", "Str", "oleacc", "Ptr")
 
   VarSetCapacity(IID, 16), idObject &= 0xFFFFFFFF
@@ -165,8 +165,8 @@ AccObjectFromWindow(hWnd, idObject = 0) {
 
 AccChildren(Acc) {
   static VT_DISPATCH := 9
-  Loop 1  {
-    if ComObjType(Acc, "Name") != "IAccessible"  {
+  Loop 1 {
+    if ComObjType(Acc, "Name") != "IAccessible" {
       error := "Invalid IAccessible Object"
       break
     }
@@ -180,7 +180,7 @@ AccChildren(Acc) {
       error := "AccessibleChildren DllCall Failed"
       break
     }
-    Loop % cChildren  {
+    Loop % cChildren {
       i := (A_Index - 1)*(A_PtrSize*2 + 8)
       child := NumGet(varChildren, i + 8)
       Children.Push( (b := NumGet(varChildren, i) = VT_DISPATCH) ? AccQuery(child) : child )
