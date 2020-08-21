@@ -111,13 +111,26 @@ JS =
     }
   }());
 )
-
 return
 
-+s::
+#c::
+Run, %A_ProgramFiles% (x86)\Google\Chrome\Application\chrome.exe "--remote-debugging-port=9222"
+return
+
+#f::
+if WinExist("ahk_exe Chrome.exe")
+{
+  Page := Chrome.GetPage()
+  Page.Call("Page.navigate", {"url": "https://flickr.com/"})
+  Page.Disconnect()
+}
+return
+
+#d::
 if WinExist("ahk_exe Chrome.exe")
 {
   Page := Chrome.GetPage()
   Page.Evaluate(JS)
   Page.Disconnect()
 }
+return
